@@ -30,6 +30,24 @@ public class KevinBacon {
                 map.get(source).add(destination);
                 map.get(destination).add(source);
             }
+
+            public void vertexCount() {
+                System.out.println("vertices in graph:" + map.keySet().size());
+            }
+            public void edgeCount() {
+                int i = 0;
+                for (T v : map.keySet()) {
+                    i += map.get(v).size();
+                }
+                System.out.println("edges in graph: " + i/2);
+            }
+
+            public boolean hasEdge (T s, T d) {
+                if (map.get(s).contains(d)) {
+                    return true;
+                }
+                return false;
+            }
         }
 
 
@@ -57,13 +75,13 @@ public class KevinBacon {
                     // [] = array
                     // { } = "object" / "dictionary" / "hashtable" -- key "name": value
 
-                    System.out.println("Title: " + title);
+                    //System.out.println("Title: " + title);
                     Object object = jsonParser.parse(castJSON);
                     JSONArray jsonArray = (JSONArray) object;
                     List<Integer> actor_num_list = new ArrayList<>();
                     for (int i = 0; i < jsonArray.size(); i++) {
                         JSONObject jsonObject = (JSONObject) jsonArray.get(i);
-                        System.out.println(" * " + jsonObject.get("name"));
+                        //System.out.println(" * " + jsonObject.get("name"));
                         Object actor = jsonObject.get("name");
 
                         actorsAsKey.putIfAbsent(actor, actorKCount++);
@@ -72,14 +90,14 @@ public class KevinBacon {
                         //
                         //this line of code is breaking the program
                         //figure out why
+                        actor_num_list.add((Integer) actorsAsKey.get(actor));
                     }
-                    //for (int j = 0; j < actor_num_list.size() - 2; j++) {
-                        //for (int k = 0; k < actor_num_list.size() - 1; k++) {
-                        //    graph.addEdge(actor_num_list.get(j), actor_num_list.get(k));
-                        //    System.out.println("test");
+                    for (int j = 0; j < actor_num_list.size() - 1; j++) {
+                        for (int k = 0; k < actor_num_list.size(); k++) {
+                            graph.addEdge(actor_num_list.get(j), actor_num_list.get(k));
 
-                        //}
-                    //}
+                        }
+                    }
                 }
                 ++movies;
             }
@@ -91,6 +109,9 @@ public class KevinBacon {
         }
         //System.out.println(graph.map);
         //System.out.println(actorsAsKey);
+        graph.vertexCount();
+        graph.edgeCount();
+        System.out.println(graph.hasEdge(5, 505));
     }
 
 }
