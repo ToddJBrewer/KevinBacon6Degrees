@@ -27,8 +27,12 @@ public class KevinBacon {
                 if (!map.containsKey(destination)) {
                     addVertex(destination);
                 }
-                map.get(source).add(destination);
-                map.get(destination).add(source);
+                if (!map.get(source).contains(destination)) {
+                    map.get(source).add(destination);
+                }
+                if (!map.get(destination).contains(source)) {
+                    map.get(destination).add(source);
+                }
             }
 
             public void vertexCount() {
@@ -106,50 +110,50 @@ public class KevinBacon {
 
             int movies = 0;
 
-            for (CSVRecord csvRecord : csvParser) {
-                if (movies > 0) {
-                    String title = csvRecord.get(1);
-                    String castJSON = csvRecord.get(2);
-                    // [] = array
-                    // { } = "object" / "dictionary" / "hashtable" -- key "name": value
+                for (CSVRecord csvRecord : csvParser) {
+                    if (movies > 0) {
+                        String title = csvRecord.get(1);
+                        String castJSON = csvRecord.get(2);
+                        // [] = array
+                        // { } = "object" / "dictionary" / "hashtable" -- key "name": value
 
-                    //System.out.println("Title: " + title);
-                    Object object = jsonParser.parse(castJSON);
-                    JSONArray jsonArray = (JSONArray) object;
-                    List<Integer> actor_num_list = new ArrayList<>();
-                    for (int i = 0; i < jsonArray.size(); i++) {
-                        JSONObject jsonObject = (JSONObject) jsonArray.get(i);
-                        //System.out.println(" * " + jsonObject.get("name"));
-                        Object actor = jsonObject.get("name");
+                        //System.out.println("Title: " + title);
+                        Object object = jsonParser.parse(castJSON);
+                        JSONArray jsonArray = (JSONArray) object;
+                        List<Integer> actor_num_list = new ArrayList<>();
+                        for (int i = 0; i < jsonArray.size(); i++) {
+                            JSONObject jsonObject = (JSONObject) jsonArray.get(i);
+                            //System.out.println(" * " + jsonObject.get("name"));
+                            Object actor = jsonObject.get("name");
 
-                        actorsAsKey.putIfAbsent(actor, actorKCount++);
+                            actorsAsKey.putIfAbsent(actor, actorKCount++);
 
-                        //actor_num_list.add((Integer) actor);
-                        //
-                        //this line of code is breaking the program
-                        //figure out why
-                        actor_num_list.add((Integer) actorsAsKey.get(actor));
-                    }
-                    for (int j = 0; j < actor_num_list.size() - 1; j++) {
-                        for (int k = 0; k < actor_num_list.size(); k++) {
-                            graph.addEdge(actor_num_list.get(j), actor_num_list.get(k));
+                            //actor_num_list.add((Integer) actor);
+                            //
+                            //this line of code is breaking the program
+                            //figure out why
+                            actor_num_list.add((Integer) actorsAsKey.get(actor));
+                        }
+                        for (int j = 0; j < actor_num_list.size() - 1; j++) {
+                            for (int k = 0; k < actor_num_list.size(); k++) {
+                                graph.addEdge(actor_num_list.get(j), actor_num_list.get(k));
 
+                            }
                         }
                     }
+                    ++movies;
                 }
-                ++movies;
-            }
 
             csvParser.close();
         } catch (Exception e) {
             // TODO Auto-generated catch block
             System.out.println("File " + args[0] + " is invalid or is in the wrong format.");
         }
-        //System.out.println(graph.map);
+        System.out.println(graph.map);
         //System.out.println(actorsAsKey);
         graph.vertexCount();
         graph.edgeCount();
-        System.out.println(graph.hasEdge(5, 505));
+        //System.out.println(graph.hasEdge(3, 1353));
     }
 
 }
