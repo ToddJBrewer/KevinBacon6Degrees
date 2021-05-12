@@ -50,6 +50,44 @@ public class KevinBacon {
             }
         }
 
+        public class Edge{
+            Node source;
+            Node destination;
+
+            Edge(Node s, Node d) {
+                source = s;
+                destination = d;
+                int weight = 1;
+            }
+        }
+
+        public static class Node {
+            int n;
+            String name;
+            boolean visited;
+            LinkedList<Edge> edges;
+
+            Node(int n, String name) {
+                this.n = n;
+                this.name = name;
+                visited = false;
+                edges = new LinkedList<>();
+            }
+
+            boolean IsVisited() {
+                return visited;
+            }
+
+            void visit() {
+                visited = true;
+            }
+
+            void unVisit() {
+                visited = false;
+            }
+        }
+
+
 
 
 
