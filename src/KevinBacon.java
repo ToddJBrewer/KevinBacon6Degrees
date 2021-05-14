@@ -13,6 +13,65 @@ import org.json.simple.JSONArray;
 
 public class KevinBacon {
 
+    public static void main(String[] args) {
+        //int actorVCount = 0;
+        int actorKCount = 0;
+        Hashtable actorsAsKey = new Hashtable();
+        //Hashtable actorsAsValue = new Hashtable();
+        Graph graph = new Graph();
+
+        try {
+            Reader reader = new FileReader(args[0]);
+            CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT);
+            JSONParser jsonParser = new JSONParser();
+
+            int movies = 0;
+
+            for (CSVRecord csvRecord : csvParser) {
+                if (movies > 0) {
+                    String title = csvRecord.get(1);
+                    String castJSON = csvRecord.get(2);
+                    // [] = array
+                    // { } = "object" / "dictionary" / "hashtable" -- key "name": value
+
+                    //System.out.println("Title: " + title);
+                    Object object = jsonParser.parse(castJSON);
+                    JSONArray jsonArray = (JSONArray) object;
+                    List<Integer> actor_num_list = new ArrayList<>();
+                    for (int i = 0; i < jsonArray.size(); i++) {
+                        JSONObject jsonObject = (JSONObject) jsonArray.get(i);
+                        //System.out.println(" * " + jsonObject.get("name"));
+                        Object actor = jsonObject.get("name");
+
+                        actorsAsKey.putIfAbsent(actor, actorKCount++);
+                        actor_num_list.add((Integer) actorsAsKey.get(actor));
+                    }
+                    for (int j = 0; j < actor_num_list.size() - 1; j++) {
+                        for (int k = 0; k < actor_num_list.size(); k++) {
+                            graph.addEdge(actor_num_list.get(j), actor_num_list.get(k));
+
+                        }
+                    }
+                }
+                ++movies;
+            }
+
+            csvParser.close();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            System.out.println("File " + args[0] + " is invalid or is in the wrong format.");
+        }
+        //System.out.println(graph.map);
+        //System.out.println(actorsAsKey);
+        System.out.println(graph.vertexCount());
+        graph.edgeCount();
+        System.out.println(graph.hasEdge(3, 15));
+        System.out.println(graph.hasEdge(0, 1250));
+        Graph.Node node1 = new Graph.Node(1, "test");
+        Graph.Node node2 = new Graph.Node(2, "test again");
+        graph.findPath(node1, node1);
+    }
+
     Graph graph = new Graph();
 
     public static class Graph<T> {
@@ -62,12 +121,10 @@ public class KevinBacon {
             HashMap<Node, Node> tempPath = new HashMap<>();
             tempPath.put(s, null);
             HashMap<Node, Integer> smallestPath = new HashMap<>();
-            int v = map.vertexCount();
             for (Object item : map.keySet()) {
                 if (s == d) {
                     smallestPath.put(s, 0);
-                }
-                else {
+                } else {
                     smallestPath.put(s, Integer.MAX_VALUE);
                 }
             }
@@ -84,13 +141,26 @@ public class KevinBacon {
         }
 
         public Node nearestUnvisited(HashMap<Node, Integer> smallestPath) {
-            int distance = 99999;
+            Integer sDistance = Integer.MAX_VALUE;
             Node nearest = null;
             for (Object node : map.keySet()) {
-        }
-    }
+                if (Node.isVisited()) {
+                    continue;
+                }
+                Integer curDistance = smallestPath.get(node);
+                if (curDistance == Integer.MAX_VALUE) {
+                    continue;
+                }
+                if (sDistance > curDistance) {
+                    sDistance = curDistance;
+                    nearest = (Node) node;
+                }
+            }
+            return nearest;
 
-        public class Edge implements Comparable<Edge> {
+        }
+
+        public static class Edge implements Comparable<Edge> {
             Node source;
             Node destination;
             int weight;
@@ -105,15 +175,15 @@ public class KevinBacon {
             public int compareTo(Edge o) {
                 if (this.weight > o.weight) {
                     return 1;
-                }
-                else return -1;
+                } else return -1;
             }
         }
 
         public static class Node {
+            public static boolean visited;
             int n;
             String name;
-            boolean visited;
+            //boolean visited;
             LinkedList<Edge> edges;
 
             Node(int n, String name) {
@@ -123,24 +193,24 @@ public class KevinBacon {
                 edges = new LinkedList<>();
             }
 
-            boolean IsVisited() {
+            public static boolean isVisited() {
                 return visited;
             }
 
-            void visit() {
+            public void visit() {
                 visited = true;
             }
 
-            void unVisit() {
+            public void unVisit() {
                 visited = false;
             }
         }
 
-        public void createGraph() {}
+        public void createGraph() {
+        }
 
 
-        public static void main(String[] args) {
-
+/*        public static void main(String[] args) {
             //int actorVCount = 0;
             int actorKCount = 0;
             Hashtable actorsAsKey = new Hashtable();
@@ -196,9 +266,11 @@ public class KevinBacon {
             System.out.println(graph.hasEdge(0, 1250));
             Node node1 = new Node(1, "test");
             Node node2 = new Node(2, "test again");
-            graph.findPath(node1, node1, graph);
-        }
+            graph.findPath(node1, node1);
+        }*/
 
     }
+}
+
 
 
