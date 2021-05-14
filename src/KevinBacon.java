@@ -1,6 +1,7 @@
 import java.io.FileReader;
 import java.io.Reader;
 import java.util.*;
+import java.util.HashMap;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -12,56 +13,100 @@ import org.json.simple.JSONArray;
 
 public class KevinBacon {
 
+    Graph graph = new Graph();
 
     public static class Graph<T> {
-            Map<T, List<T>> map = new HashMap<>();
+        Map<T, List<T>> map = new HashMap<>();
 
-            public void addVertex (T v){
-                map.put(v, new LinkedList<T>());
-            }
+        public void addVertex(T v) {
+            map.put(v, new LinkedList<T>());
+        }
 
-            public void addEdge(T source, T destination) {
-                if (!map.containsKey(source)) {
-                    addVertex(source);
-                }
-                if (!map.containsKey(destination)) {
-                    addVertex(destination);
-                }
-                if (!map.get(source).contains(destination)) {
-                    map.get(source).add(destination);
-                }
-                if (!map.get(destination).contains(source)) {
-                    map.get(destination).add(source);
-                }
+        public void addEdge(T source, T destination) {
+            if (!map.containsKey(source)) {
+                addVertex(source);
             }
-
-            public void vertexCount() {
-                System.out.println("vertices in graph:" + map.keySet().size());
+            if (!map.containsKey(destination)) {
+                addVertex(destination);
             }
-            public void edgeCount() {
-                int i = 0;
-                for (T v : map.keySet()) {
-                    i += map.get(v).size();
-                }
-                System.out.println("edges in graph: " + i/2);
+            if (!map.get(source).contains(destination)) {
+                map.get(source).add(destination);
             }
-
-            public boolean hasEdge (T s, T d) {
-                if (map.get(s).contains(d)) {
-                    return true;
-                }
-                return false;
+            if (!map.get(destination).contains(source)) {
+                map.get(destination).add(source);
             }
         }
 
-        public class Edge{
+        public int vertexCount() {
+            return map.keySet().size();
+        }
+
+        public void edgeCount() {
+            int i = 0;
+            for (T v : map.keySet()) {
+                i += map.get(v).size();
+            }
+            System.out.println("edges in graph: " + i / 2);
+        }
+
+        public boolean hasEdge(T s, T d) {
+            if (map.get(s).contains(d)) {
+                return true;
+            }
+            return false;
+        }
+
+        public void findPath(Node s, Node d) {
+            //Set keys = map.keySet();
+            //for (Object key : keys) {
+            HashMap<Node, Node> tempPath = new HashMap<>();
+            tempPath.put(s, null);
+            HashMap<Node, Integer> smallestPath = new HashMap<>();
+            int v = map.vertexCount();
+            for (Object item : map.keySet()) {
+                if (s == d) {
+                    smallestPath.put(s, 0);
+                }
+                else {
+                    smallestPath.put(s, Integer.MAX_VALUE);
+                }
+            }
+            for (Edge edge : s.edges) {
+                smallestPath.put(edge.destination, edge.weight);
+                tempPath.put(edge.destination, s);
+            }
+            s.visit();
+            while (true) {
+                Node cur = nearestUnvisited(smallestPath);
+            }
+
+
+        }
+
+        public Node nearestUnvisited(HashMap<Node, Integer> smallestPath) {
+            int distance = 99999;
+            Node nearest = null;
+            for (Object node : map.keySet()) {
+        }
+    }
+
+        public class Edge implements Comparable<Edge> {
             Node source;
             Node destination;
+            int weight;
 
             Edge(Node s, Node d) {
                 source = s;
                 destination = d;
                 int weight = 1;
+            }
+
+            @Override
+            public int compareTo(Edge o) {
+                if (this.weight > o.weight) {
+                    return 1;
+                }
+                else return -1;
             }
         }
 
@@ -91,24 +136,23 @@ public class KevinBacon {
             }
         }
 
+        public void createGraph() {}
 
 
+        public static void main(String[] args) {
 
+            //int actorVCount = 0;
+            int actorKCount = 0;
+            Hashtable actorsAsKey = new Hashtable();
+            //Hashtable actorsAsValue = new Hashtable();
+            Graph graph = new Graph();
 
-    public static void main(String[] args) {
+            try {
+                Reader reader = new FileReader(args[0]);
+                CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT);
+                JSONParser jsonParser = new JSONParser();
 
-        //int actorVCount = 0;
-        int actorKCount = 0;
-        Hashtable actorsAsKey = new Hashtable();
-        //Hashtable actorsAsValue = new Hashtable();
-        Graph graph = new Graph();
-
-        try {
-            Reader reader = new FileReader(args[0]);
-            CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT);
-            JSONParser jsonParser = new JSONParser();
-
-            int movies = 0;
+                int movies = 0;
 
                 for (CSVRecord csvRecord : csvParser) {
                     if (movies > 0) {
@@ -127,11 +171,6 @@ public class KevinBacon {
                             Object actor = jsonObject.get("name");
 
                             actorsAsKey.putIfAbsent(actor, actorKCount++);
-
-                            //actor_num_list.add((Integer) actor);
-                            //
-                            //this line of code is breaking the program
-                            //figure out why
                             actor_num_list.add((Integer) actorsAsKey.get(actor));
                         }
                         for (int j = 0; j < actor_num_list.size() - 1; j++) {
@@ -144,17 +183,22 @@ public class KevinBacon {
                     ++movies;
                 }
 
-            csvParser.close();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            System.out.println("File " + args[0] + " is invalid or is in the wrong format.");
+                csvParser.close();
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                System.out.println("File " + args[0] + " is invalid or is in the wrong format.");
+            }
+            //System.out.println(graph.map);
+            //System.out.println(actorsAsKey);
+            System.out.println(graph.vertexCount());
+            graph.edgeCount();
+            System.out.println(graph.hasEdge(3, 15));
+            System.out.println(graph.hasEdge(0, 1250));
+            Node node1 = new Node(1, "test");
+            Node node2 = new Node(2, "test again");
+            graph.findPath(node1, node1, graph);
         }
-        System.out.println(graph.map);
-        //System.out.println(actorsAsKey);
-        graph.vertexCount();
-        graph.edgeCount();
-        //System.out.println(graph.hasEdge(3, 1353));
+
     }
 
-}
 
