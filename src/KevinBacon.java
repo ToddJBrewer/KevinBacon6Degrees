@@ -60,6 +60,7 @@ public class KevinBacon {
             }
 
             csvParser.close();
+
         } catch (Exception e) {
             // TODO Auto-generated catch block
             System.out.println("File " + args[0] + " is invalid or is in the wrong format.");
@@ -82,18 +83,24 @@ public class KevinBacon {
         //Object actor = actorsAsValue.get(818);
         //System.out.println(actor);
 
+
         int actor1 = (int) actorsAsKey.get("Kate Bosworth");
         Node node1 = new Node(actor1, "Kate Bosworth");
-        node1.edges = (LinkedList<Edge>) graph.map.get(816);
-        //System.out.println(node1);
+        LinkedList<Integer> node1Edges = (LinkedList<Integer>) graph.map.get(816);
+        node1.edges = node1Edges;
+        System.out.println(node1);
+
         int actor2 = (int) actorsAsKey.get("Parker Posey");
         Node node2 = new Node(actor2, "Parker Posey");
-        node2.edges = (LinkedList<Edge>) graph.map.get(818);
-        //System.out.println(node2);
+        LinkedList<Integer> node2Edges = (LinkedList<Integer>) graph.map.get(818);
+        node2.edges = node2Edges;
+        System.out.println(node2);
 
-        //graph.findPath(node1, node2);
+
+
+        graph.findPath(node1, node2);
         //graph.checkNeighbor(node1, node2, graph);
-        graph.findPath(node1, node2, graph);
+        //graph.findPath(node1, node2, graph);
 
 
         //System.out.println(graph.map.get(1));

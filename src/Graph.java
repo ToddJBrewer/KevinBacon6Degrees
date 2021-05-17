@@ -44,7 +44,7 @@ public class Graph<T> {
         }
         return false;
     }
-/*        public void findPath(Node s, Node d) {
+        public void findPath(Node s, Node d) {
         HashMap<Node, Node> tempPath = new HashMap<>();
         tempPath.put(s, null);
         HashMap<Node, Double> smallestPath = new HashMap<>();
@@ -66,12 +66,10 @@ public class Graph<T> {
         //System.out.println(temp);
         //smallestPath.put(temp, 1.0);
         //System.out.println("test");
-
         //}
-            s.edges.toArray();
-        for (Edge edge : s.edges) {
-            smallestPath.put(edge.destination, edge.weight);
-            tempPath.put(edge.destination, s);
+        for (Integer edge : s.edges) {
+            smallestPath.put(Edge.destination, Edge.weight);
+            tempPath.put(Edge.destination, s);
         }
         //System.out.println(checkHere);
         s.visit();
@@ -83,7 +81,6 @@ public class Graph<T> {
             }
             if (cur == d) {
                 System.out.println("path with shortest path between " + s.name.toString() + " and " + d.name.toString() + ": ");
-
                 Node child = d;
                 String path = d.name;
                 while (true) {
@@ -100,19 +97,16 @@ public class Graph<T> {
             }
             cur.visit();
             assert cur != null;
-            for (Edge edge : cur.edges) {
+            for (Integer edge : cur.edges) {
                 if (Edge.destination.isVisited())
                     continue;
-                if (smallestPath.get(cur) + edge.weight < smallestPath.get(edge.destination)) {
-                    smallestPath.put(edge.destination, smallestPath.get(cur) + edge.weight);
-                    tempPath.put(edge.destination, cur);
+                if (smallestPath.get(cur) + Edge.weight < smallestPath.get(Edge.destination)) {
+                    smallestPath.put(Edge.destination, smallestPath.get(cur) + Edge.weight);
+                    tempPath.put(Edge.destination, cur);
                 }
-
             }
         }
-
     }
-
     public Node nearestUnvisited(HashMap<Node, Double> smallestPath) {
         Double sDistance = Double.MAX_VALUE;
         Node nearest = null;
@@ -130,8 +124,7 @@ public class Graph<T> {
             }
         }
         return nearest;
-
-    }*/
+    }
 
     public void checkNeighbor(Node s, Node d, Graph graph) {
         //System.out.println(s.edges);
@@ -149,27 +142,27 @@ public class Graph<T> {
 
 
 
-        }
-
-        public void findPath(Node s, Node d, Graph graph) {
-            int len = graph.vertexCount();
-            int[] Vertex = new int[len];
-            boolean[] Known = new boolean[len];
-            int[] Path = new int[len];
-            int[] bestCost = new int[len];
-            for (int i = 0; i < len-1; i++) {
-                Vertex[i] = i;
-                Known[i] = false;
-                Path[i] = -1;
-                bestCost[i] = -1;
-            }
-            bestCost[0] = 0;
-
-
-            System.out.println(Vertex[5]);
-            System.out.println(Path[19]);
-            System.out.println(Known[8]);
-            System.out.println(bestCost[0]);
-        }
-
     }
+
+/*    public void findPath(Node s, Node d, Graph graph) {
+        int len = graph.vertexCount();
+        int[] Vertex = new int[len];
+        boolean[] Known = new boolean[len];
+        int[] Path = new int[len];
+        int[] bestCost = new int[len];
+        for (int i = 0; i < len-1; i++) {
+            Vertex[i] = i;
+            Known[i] = false;
+            Path[i] = -1;
+            bestCost[i] = -1;
+        }
+        bestCost[0] = 0;
+
+
+        System.out.println(Vertex[5]);
+        System.out.println(Path[19]);
+        System.out.println(Known[8]);
+        System.out.println(bestCost[0]);
+    }*/
+
+}

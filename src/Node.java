@@ -4,12 +4,11 @@ public class Node {
     public static boolean visited;
     public static int n;
     public static String name;
-    //boolean visited;
-    public static LinkedList<Edge> edges;
+    public static LinkedList<Integer> edges;
 
-    Node(int n, String name) {
-        this.n = n;
-        this.name = name;
+    Node(int num, String Name) {
+        n = num;
+        name = Name;
         visited = false;
         edges = new LinkedList<>();
     }
