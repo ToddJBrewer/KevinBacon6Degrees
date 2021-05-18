@@ -1,23 +1,27 @@
 import java.util.LinkedList;
 
 public class Node {
-    public static boolean visited;
-    public static int n;
-    public static String name;
-    public static LinkedList<Integer> edges;
+    LinkedList<Edge> edges;
+    int n;
+    String name;
+    private boolean visited;
 
-    Node(int num, String Name) {
-        n = num;
-        name = Name;
+    Node(int n, String name) {
+        this.n = n;
+        this.name = name;
         visited = false;
         edges = new LinkedList<>();
     }
 
-    public static boolean isVisited() {
+    void resetNodes() {
+        visited = false;
+    }
+
+    public boolean isVisited() {
         return visited;
     }
 
-    public static void visit() {
+    public void visit() {
         visited = true;
     }
 

@@ -1,132 +1,187 @@
 import java.sql.Array;
 import java.util.*;
 import java.util.Arrays;
+import java.util.HashMap;
 
-public class Graph<T> {
-    Map<T, List<T>> map = new HashMap<>();
-    List<List<Integer>> pathResult;
-    int target;
+public class Graph {
+    //stores nodes in the graph
+    public static Set<Node> nodes;
+    //included this but it's always set to false as the graph is undirected
+    private boolean directed;
+    //var to track edges in a given path
+    public static int actorCount;
 
-    public void addVertex(T v) {
-        map.put(v, new LinkedList<T>());
+    //public static Map<Integer, List<Integer>> map = new HashMap<>();
+
+    public static void addVertexMap(Integer v){
+        KevinBacon.map.put(v, new LinkedList<>());
     }
 
-    public void addEdge(T source, T destination) {
-        if (!map.containsKey(source)) {
-            addVertex(source);
+    public static void addEdgeMap(Integer source, Integer destination) {
+        if (!KevinBacon.map.containsKey(source)) {
+            addVertexMap(source);
         }
-        if (!map.containsKey(destination)) {
-            addVertex(destination);
+        if (!KevinBacon.map.containsKey(destination)) {
+            addVertexMap(destination);
         }
-        if (!map.get(source).contains(destination)) {
-            map.get(source).add(destination);
+        if (!KevinBacon.map.get(source).contains(destination)) {
+            KevinBacon.map.get(source).add(destination);
         }
-        if (!map.get(destination).contains(source)) {
-            map.get(destination).add(source);
+        if (!KevinBacon.map.get(destination).contains(source)) {
+            KevinBacon.map.get(destination).add(source);
         }
     }
 
-    public int vertexCount() {
-        return map.keySet().size();
+    Graph(boolean directed) {
+        this.directed = directed;
+        nodes = new HashSet<>();
     }
 
-    public void edgeCount() {
-        int i = 0;
-        for (T v : map.keySet()) {
-            i += map.get(v).size();
-        }
-        System.out.println("edges in graph: " + i / 2);
-    }
-
-    public boolean hasEdge(T s, T d) {
-        if (map.get(s).contains(d)) {
-            return true;
-        }
-        return false;
-    }
-        public void findPath(Node s, Node d) {
-        HashMap<Node, Node> tempPath = new HashMap<>();
-        tempPath.put(s, null);
-        HashMap<Node, Double> smallestPath = new HashMap<>();
-        for (Object item : map.keySet()) {
-            if (s == d) {
-                smallestPath.put(s, 0.0);
-            } else {
-                smallestPath.put(s, Double.MAX_VALUE);
+    public void showAllEdges() {
+        for (Node node : nodes) {
+            LinkedList<Edge> edges = node.edges;
+            if (edges.isEmpty()) {
+                System.out.println(node.name + " is not connected to anything. this should not happen ");
+                continue;
+            }
+            System.out.println(node.name + " has edges: ");
+            for (Edge edge : edges) {
+                System.out.println(edge.destination.name);
             }
         }
-        //Object[] test = s.edges.toArray();
-        //for (int i = 0; test.length > i; i++) {
-        //for (Edge edge : s.edges) {
-        //smallestPath.put(s.edges.get(i).destination, s.edges.get(i).weight);
-        //tempPath.put(s.edges.get(i).destination, s);
-        //for (int edge = 0; edge < s.edges.size(); edge++) {
-        //smallestPath.put(s.edges.get(edge).destination, s.edges.get(edge).weight);
-        //int temp = s.edges.indexOf(edge);
-        //System.out.println(temp);
-        //smallestPath.put(temp, 1.0);
-        //System.out.println("test");
-        //}
-        for (Integer edge : s.edges) {
-            smallestPath.put(Edge.destination, Edge.weight);
-            tempPath.put(Edge.destination, s);
+
+    }
+
+    public void findPath(Node s, Node d) {
+        actorCount = 0;
+        HashMap<Node, Node> path = new HashMap<>();
+        path.put(s, null);
+        HashMap<Node, Double> bestPath = new HashMap<>();
+
+        for (Node node : nodes) {
+            if (node == s) {
+                bestPath.put(node, 0.0);
+            }
+            else {
+                bestPath.put(node, Double.MAX_VALUE);
+            }
         }
-        //System.out.println(checkHere);
+
+        for (Edge edge : s.edges) {
+            bestPath.put(edge.destination, edge.weight);
+            path.put(edge.destination, s);
+        }
         s.visit();
         while (true) {
-            Node cur = nearestUnvisited(smallestPath);
-            if (cur == null) {
-                System.out.println("no path between " + s.name + " and " + d.name);
+            Node curNode = nearestNode(bestPath);
+            if (curNode == null) {
+                System.out.println("no path between the following: " + s.name + " to " + d.name);
                 return;
             }
-            if (cur == d) {
-                System.out.println("path with shortest path between " + s.name.toString() + " and " + d.name.toString() + ": ");
-                Node child = d;
-                String path = d.name;
+            if (curNode == d) {
+                System.out.println("path found between " + s.name + " to " + d.name);
+                Node c = d;
+                String route = d.name;
                 while (true) {
-                    Node par = tempPath.get(child);
-                    if (par == null) {
+                    Node p = path.get(c);
+                    if (p == null) {
                         break;
                     }
-                    path = par.name + " " + path;
-                    child = par;
+                    route = p.name + " to " + route;
+                    c = p;
+                    actorCount+=1;
                 }
-                System.out.println(path);
-                System.out.println("The path costs: " + smallestPath.get(d));
+                System.out.println(route);
+                System.out.println("number of actors (or edges) in the path: " + actorCount);
                 return;
             }
-            cur.visit();
-            assert cur != null;
-            for (Integer edge : cur.edges) {
-                if (Edge.destination.isVisited())
+            curNode.visit();
+            for (Edge edge : curNode.edges) {
+                if (edge.destination.isVisited()) {
                     continue;
-                if (smallestPath.get(cur) + Edge.weight < smallestPath.get(Edge.destination)) {
-                    smallestPath.put(Edge.destination, smallestPath.get(cur) + Edge.weight);
-                    tempPath.put(Edge.destination, cur);
+                }
+                if (bestPath.get(curNode) + edge.weight < bestPath.get(edge.destination)) {
+                    bestPath.put(edge.destination, bestPath.get(curNode) + edge.weight);
+                    path.put(edge.destination, curNode);
                 }
             }
+
         }
     }
-    public Node nearestUnvisited(HashMap<Node, Double> smallestPath) {
-        Double sDistance = Double.MAX_VALUE;
+
+
+    private Node nearestNode(HashMap<Node, Double> bestPath) {
+        double d = Double.MAX_VALUE;
         Node nearest = null;
-        for (Object node : map.keySet()) {
-            if (Node.isVisited()) {
+        for (Node node : nodes) {
+            if (node.isVisited()) {
                 continue;
             }
-            Double curDistance = smallestPath.get(node);
-            if (curDistance == Double.MAX_VALUE) {
+            double curD = bestPath.get(node);
+            if (curD == Double.MAX_VALUE) {
                 continue;
             }
-            if (sDistance > curDistance) {
-                sDistance = curDistance;
-                nearest = (Node) node;
+            if (curD < d) {
+                d = curD;
+                nearest = node;
             }
         }
         return nearest;
     }
 
-    public void checkNeighbor(Node s, Node d, Graph graph) {
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Graph{");
+        sb.append("directed=").append(directed);
+        sb.append('}');
+        return sb.toString();
+    }
+
+    public void resetNodes() {
+        for (Node node : nodes) {
+            node.resetNodes();
+        }
+    }
+
+    public void addEdge(Node s, Node d, double w) {
+        nodes.add(s);
+        nodes.add(d);
+        checkDuplicate(s, d, w);
+        if (!directed && s != d) {
+            checkDuplicate(d, s, w);
+        }
+    }
+
+    public void checkDuplicate(Node x, Node y, double w) {
+        for (Edge edge : x.edges) {
+            if (edge.source == x && edge.destination == y) {
+                edge.weight = w;
+                return;
+            }
+        }
+        x.edges.add(new Edge(x, y, w));
+    }
+
+    //public int vertexCount() {
+    //    return map.keySet().size();
+    //}
+
+/*    public void edgeCount() {
+        int i = 0;
+        for (T v : map.keySet()) {
+            i += map.get(v).size();
+        }
+        System.out.println("edges in graph: " + i / 2);
+    }*/
+
+/*    public boolean hasEdge(T s, T d) {
+        if (map.get(s).contains(d)) {
+            return true;
+        }
+        return false;
+    }*/
+
+ /*   public void checkNeighbor(Node s, Node d, Graph graph) {
         //System.out.println(s.edges);
         HashSet setS = new HashSet();
         setS.add(s.edges);
@@ -142,7 +197,7 @@ public class Graph<T> {
 
 
 
-    }
+    }*/
 
 /*    public void findPath(Node s, Node d, Graph graph) {
         int len = graph.vertexCount();
@@ -164,5 +219,10 @@ public class Graph<T> {
         System.out.println(Known[8]);
         System.out.println(bestCost[0]);
     }*/
+
+            /*    public void addVertex(T v) {
+        map.put(v, new LinkedList<T>());
+    }*/
+            //Map<T, List<T>> map = new HashMap<>();
 
 }

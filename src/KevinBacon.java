@@ -2,8 +2,6 @@ import java.io.FileReader;
 import java.io.Reader;
 import java.util.*;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Arrays;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -14,13 +12,16 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
 
 public class KevinBacon {
+    public static int actorVCount = 0;
+    public static int actorKCount = 0;
+    public static Hashtable actorsAsKey = new Hashtable();
+    public static Hashtable actorsAsValue = new Hashtable();
+    public static Graph graph = new Graph(false);
+    public static Map<Integer, List<Integer>> map = new HashMap<>();
+
+
 
     public static void main(String[] args) {
-        int actorVCount = 0;
-        int actorKCount = 0;
-        Hashtable actorsAsKey = new Hashtable();
-        Hashtable actorsAsValue = new Hashtable();
-        Graph graph = new Graph();
 
         try {
             Reader reader = new FileReader(args[0]);
@@ -48,63 +49,82 @@ public class KevinBacon {
                         actorsAsKey.putIfAbsent(actor, actorKCount++);
                         actor_num_list.add((Integer) actorsAsKey.get(actor));
                         actorsAsValue.putIfAbsent(actorVCount++, actor);
-                    }
-                    for (int j = 0; j < actor_num_list.size() - 1; j++) {
-                        for (int k = 0; k < actor_num_list.size(); k++) {
-                            graph.addEdge(actor_num_list.get(j), actor_num_list.get(k));
-
                         }
+                        for (int j = 0; j < actor_num_list.size() - 1; j++) {
+                            for (int k = 0; k < actor_num_list.size(); k++) {
+                                Graph.addEdgeMap(actor_num_list.get(j), actor_num_list.get(k));
+                                int sNum = actor_num_list.get(j);
+                                String sName = (String) actorsAsValue.get(actor_num_list.get(j));
+                                Node s = new Node(sNum, sName);
+
+                                int dNum = actor_num_list.get(k);
+                                String dName = (String) actorsAsValue.get(actor_num_list.get(k));
+                                Node d = new Node(dNum, dName);
+
+
+                                //this adds an edge between the two nodes but because of the way i wrote
+                                //the code the nodes keep overwriting eachother which causes it not to work
+                                //i think i need use my hashmap var map which properly stores the edges and
+                                //add them in outside the loop. making edges a data member of the node class
+                                //seems to have been a mistake
+                                graph.addEdge(s, d, 1.0);
+
+                            }
                     }
                 }
                 ++movies;
             }
 
-            csvParser.close();
-
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            System.out.println("File " + args[0] + " is invalid or is in the wrong format.");
-        }
-        //System.out.println(graph.map);
-        //System.out.println(actorsAsValue);
-        //System.out.println(graph.vertexCount());
-        //graph.edgeCount();
-        //System.out.println(graph.hasEdge(3, 15));
-        //System.out.println(graph.hasEdge(0, 1250));
-        //System.out.println(graph.map.get(1));
-        //Graph.Node node1 = new Graph.Node(1, "actor x");
-        //Graph.Node node2 = new Graph.Node(2, "actor y");
-
-        //Graph.Node five = new Graph.Node(5, "test");
-        //five.edges = (LinkedList<Graph.Edge>) graph.map.get(5);
-        //five.name = (String) actorsAsKey.get("Kevin Bacon");
-        //System.out.println(five);
-        //System.out.println(actorsAsKey.get(20648));
-        //Object actor = actorsAsValue.get(818);
-        //System.out.println(actor);
+                csvParser.close();
 
 
-        int actor1 = (int) actorsAsKey.get("Kate Bosworth");
-        Node node1 = new Node(actor1, "Kate Bosworth");
-        LinkedList<Integer> node1Edges = (LinkedList<Integer>) graph.map.get(816);
-        node1.edges = node1Edges;
-        System.out.println(node1);
+            } catch(Exception e){
+                System.out.println("File " + args[0] + " is invalid or is in the wrong format.");
+            }
 
-        int actor2 = (int) actorsAsKey.get("Parker Posey");
-        Node node2 = new Node(actor2, "Parker Posey");
-        LinkedList<Integer> node2Edges = (LinkedList<Integer>) graph.map.get(818);
-        node2.edges = node2Edges;
-        System.out.println(node2);
+        //System.out.println(graph.checkEdge(s, d));
+        //graph.findPath(s, d);
 
 
+        //for (int i = 0; i < actorKCount; i++) {
+        //    int num = i;
+        //    String name = (String) actorsAsValue.get(i);
+        //    System.out.println(name);
+        //
+        //}
 
-        graph.findPath(node1, node2);
-        //graph.checkNeighbor(node1, node2, graph);
-        //graph.findPath(node1, node2, graph);
+
+        //test code. I included this small hardcoded graph to show how
+        //the logic of the program works. I couldn't get my code to work with the actor graph
+        //I realized too late that I need a different method of adding nodes
+        //to the graph among other problems that i ran out of time to fix
+        //sorry about that
+        Graph test = new Graph(false);
+        Node actor1 = new Node(1, "actor 1");
+        Node actor2 = new Node(2, "actor 2");
+        Node actor3 = new Node(3, "actor 3");
+        Node actor4 = new Node(4, "actor 4");
+        Node actor5 = new Node(5, "actor 5");
+        Node actor6 = new Node(6, "actor 6");
+
+        test.addEdge(actor1, actor2, 1);
+        test.addEdge(actor1, actor4, 1 );
+        test.addEdge(actor2, actor3, 1 );
+        test.addEdge(actor2, actor6, 1 );
+        test.addEdge(actor1, actor3, 1 );
+
+        //should find path in 3 edges
+        test.findPath(actor4, actor6);
+        test.resetNodes();
+        //should find path in 2 edges
+        test.findPath(actor1, actor6);
+        test.resetNodes();
+        //should fail
+        test.findPath(actor3, actor5);
 
 
-        //System.out.println(graph.map.get(1));
-        //System.out.println(graph.map.get(2066));
+
+
     }
 }
 

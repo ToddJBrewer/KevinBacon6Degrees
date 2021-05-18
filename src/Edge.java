@@ -1,12 +1,12 @@
 public class Edge implements Comparable<Edge> {
-    public static Node source;
-    public static Node destination;
-    public static double weight;
+    Node source;
+    Node destination;
+    double weight;
 
-    Edge(Node s, Node d) {
+    Edge(Node s, Node d, double w) {
         source = s;
         destination = d;
-        Double weight = 1.0;
+        double weight = w;
     }
 
     @Override
@@ -14,6 +14,11 @@ public class Edge implements Comparable<Edge> {
         if (this.weight > o.weight) {
             return 1;
         } else return -1;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("(%s connects to %s, %f)", source.name, destination.name, weight);
     }
 }
 
